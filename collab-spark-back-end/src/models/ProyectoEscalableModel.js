@@ -1,3 +1,4 @@
+import { Proyectos } from "./ProyectosModel.js";
 export class ProyectoEscalable extends Proyectos{
     #etapas
     #presupuesto
@@ -13,9 +14,17 @@ export class ProyectoEscalable extends Proyectos{
     get Presupuesto(){
         return this.#presupuesto;
     }
-    mostrar(){
-        return{
 
-        }
+    set Etapas(value) { this.#etapas = value; }
+    set Presupuesto(value) { this.#presupuesto = value; }
+    
+
+    toJSON(){
+        return {
+            ...super.toJSON(),
+            Etapas: this.#etapas,
+            Presupuesto: this.#presupuesto
+        };
     }
 }
+export const proyectosEscalables = [];
