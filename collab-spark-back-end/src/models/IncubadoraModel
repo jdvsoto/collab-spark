@@ -1,3 +1,6 @@
+import { Recursos } from "./RecursosModel.js";
+
+
 export class Incubadora extends Recursos {
     #tipoIncubadora;
     #inversion;
