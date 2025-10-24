@@ -34,7 +34,7 @@ export function proyectoEscalableRoutes() {
     });
   });
 
-  router.delete("/  ", (req, res) => {
+  router.delete("/delete-proyecto-escalable", (req, res) => {
     const deleted = deleteProyectoEscalable(req.body.nombre);
     if (deleted) {
       return res.status(200).json({
