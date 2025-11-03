@@ -1,12 +1,21 @@
-export class Recursos {
-    #nombre;
-    #descripcion;
-    #tipo;
-    #ubicacion;
-    #duracion;
-    #requisitos;
+interface RecursosProps {
+    nombre: string;
+    descripcion: string;
+    tipo: string;
+    ubicacion: string;
+    duracion: number;
+    requisitos: string[];
+}
 
-    constructor({ nombre, descripcion, tipo, ubicacion, duracion, requisitos }) {
+export class Recursos {
+    #nombre: string;
+    #descripcion: string;
+    #tipo: string;
+    #ubicacion: string;
+    #duracion: number;
+    #requisitos: string[];
+
+    constructor({nombre, descripcion, tipo, ubicacion, duracion, requisitos}: RecursosProps) {
         this.#nombre = nombre;
         this.#descripcion = descripcion;
         this.#tipo = tipo;
