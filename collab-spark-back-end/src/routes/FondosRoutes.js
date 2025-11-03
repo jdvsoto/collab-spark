@@ -4,7 +4,7 @@ import {
   getFondos,
   deleteFondo,
   updateFondo,
-} from "../controllers/fondosController.js";
+} from "../controllers/FondosController.js";
 
 export function fondosRoutes() {
   const router = Router();

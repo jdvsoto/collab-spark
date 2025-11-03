@@ -4,7 +4,7 @@ import {
   getProgramas,
   deletePrograma,
   updatePrograma,
-} from "../controllers/programasController.js";
+} from "../controllers/ProgramasController.js";
 
 export function programasRoutes() {
   const router = Router();
