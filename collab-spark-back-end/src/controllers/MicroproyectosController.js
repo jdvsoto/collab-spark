@@ -1,5 +1,6 @@
 import {
     Microproyectos,
+    microproyectos,
 } from "../models/MicroproyectosModel.js";
 
 export const createMicroproyecto = (microproyectoData) => {
@@ -26,22 +27,22 @@ export const createMicroproyecto = (microproyectoData) => {
         Descripcion,
         objetivo
     );
-    Microproyectos.push(newMicroproyecto);
+    microproyectos.push(newMicroproyecto);
     return newMicroproyecto.toJSON();
 };
 export const getMicroproyectos = () => {
-    return Microproyectos.map((microproyecto) => microproyecto.toJSON());
+    return microproyectos.map((microproyecto) => microproyecto.toJSON());
 };
 export const deleteMicroproyecto = (nombre) => {
-    const index = Microproyectos.findIndex(microproyecto => microproyecto.Nombre === nombre);
+    const index = microproyectos.findIndex(microproyecto => microproyecto.Nombre === nombre);
     if (index !== -1) {
-        Microproyectos.splice(index, 1);
+        microproyectos.splice(index, 1);
         return true;
     }
     return false;
 };
 export const updateMicroproyecto = (nombre, updatedData) => {
-    const microproyecto = Microproyectos.find(microproyecto => microproyecto.Nombre === nombre);
+    const microproyecto = microproyectos.find(microproyecto => microproyecto.Nombre === nombre);
     if (!microproyecto) {
         throw new Error("Microproyecto no encontrado");
     }

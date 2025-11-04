@@ -1,3 +1,4 @@
+import { Proyectos } from "./ProyectosModel.js";
 export class Microproyectos extends Proyectos{
     #objetivo
 
@@ -8,11 +9,16 @@ export class Microproyectos extends Proyectos{
     get objetivo(){
         return this.#objetivo;
     }
-    
-    mostrar(){
-        return {
-            
-        }
+    set objetivo(value) { 
+        this.#objetivo = value; 
     }
-
+    
+    toJSON() {
+        return {
+            ...super.toJSON(),
+            objetivo: this.#objetivo
+        };
+    }
 }
+
+export const microproyectos = [];
