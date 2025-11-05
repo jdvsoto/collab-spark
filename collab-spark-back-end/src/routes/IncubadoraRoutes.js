@@ -4,14 +4,14 @@ import {
   getIncubadoras,
   deleteIncubadora,
   updateIncubadora,
-} from "../controllers/incubadoraController.js";
+} from "../controllers/IncubadoraController.js";
 
 export function incubadoraRoutes() {
   const router = Router();
 
-  router.post("/create-incubadora", (req, res) => {
+  router.post("/create-incubadora", async (req, res) => {
     try {
-      const nuevaIncubadora = createIncubadora(req.body);
+      const nuevaIncubadora = await createIncubadora(req.body);
       return res.status(201).json({
         success: true,
         incubadora: nuevaIncubadora,
@@ -26,33 +26,46 @@ export function incubadoraRoutes() {
     }
   });
 
-  router.get("/get-incubadoras", (req, res) => {
-    const incubadoras = getIncubadoras();
-    return res.status(200).json({
-      success: true,
-      incubadoras,
-    });
-  });
-
-  router.delete("/delete-incubadora", (req, res) => {
-    // Siguiendo el modelo de usar req.body.nombre para delete
-    const deleted = deleteIncubadora(req.body.nombre);
-    if (deleted) {
+  router.get("/get-incubadoras", async (req, res) => {
+    try {
+      const incubadoras = await getIncubadoras();
       return res.status(200).json({
         success: true,
-        message: "Incubadora eliminada",
+        incubadoras,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        error: err.message || "Error al obtener incubadoras",
       });
     }
-    return res.status(404).json({
-      success: false,
-      error: "Incubadora no encontrada",
-    });
   });
 
-  router.put("/update-incubadora/:nombre", (req, res) => {
+  router.delete("/delete-incubadora", async (req, res) => {
+    try {
+      const deleted = await deleteIncubadora(req.body.nombre);
+      if (deleted) {
+        return res.status(200).json({
+          success: true,
+          message: "Incubadora eliminada",
+        });
+      }
+      return res.status(404).json({
+        success: false,
+        error: "Incubadora no encontrada",
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        error: err.message || "Error al eliminar incubadora",
+      });
+    }
+  });
+
+  router.put("/update-incubadora/:nombre", async (req, res) => {
     try {
       const nombreABuscar = req.params.nombre;
-      const updatedIncubadora = updateIncubadora(nombreABuscar, req.body);
+      const updatedIncubadora = await updateIncubadora(nombreABuscar, req.body);
       return res.status(200).json({
         success: true,
         incubadora: updatedIncubadora,
