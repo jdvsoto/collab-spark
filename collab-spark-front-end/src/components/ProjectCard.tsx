@@ -1,32 +1,30 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Users, Calendar, ArrowRight } from "lucide-react";
+import { Heart, Users, ArrowRight, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ProjectCardProps {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  tags: string[];
-  teamSize: number;
-  maxTeam: number;
-  daysLeft: number;
-  image?: string;
+  nombre: string;
+  tipo: string;
+  duracion: string;
+  modalidad: string;
+  tecnologias: string[];
+  categoria: string;
+  participantes: number;
+  descripcion: string;
   isLiked?: boolean;
   featured?: boolean;
 }
 
 const ProjectCard = ({
-  id,
-  title,
-  description,
-  category,
-  tags,
-  teamSize,
-  maxTeam,
-  daysLeft,
-  image,
+  nombre,
+  tipo,
+  duracion,
+  modalidad,
+  tecnologias,
+  categoria,
+  participantes,
+  descripcion,
   isLiked = false,
   featured = false
 }: ProjectCardProps) => {
@@ -51,52 +49,50 @@ const ProjectCard = ({
 
       {/* Image */}
       <div className="h-48 bg-gradient-to-br from-primary/10 to-accent/10 relative overflow-hidden">
-        {image ? (
-          <img 
-            src={image} 
-            alt={title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xl">{title[0]}</span>
-            </div>
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center">
+            <span className="text-white font-bold text-xl">{nombre[0]}</span>
           </div>
-        )}
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+        {/* Project type badge */}
+        <div className="absolute bottom-4 left-4">
+          <Badge className="bg-background/80 backdrop-blur-sm">
+            {tipo}
+          </Badge>
+        </div>
       </div>
 
       {/* Content */}
       <div className="p-6">
         {/* Category */}
         <Badge variant="secondary" className="mb-3">
-          {category}
+          {categoria}
         </Badge>
 
         {/* Title & Description */}
-        <Link to={`/proyecto/${id}`}>
+        <Link to={`/proyecto/${encodeURIComponent(nombre)}`}>
           <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors cursor-pointer">
-            {title}
+            {nombre}
           </h3>
         </Link>
         <p className="text-muted-foreground text-sm leading-relaxed mb-4 line-clamp-2">
-          {description}
+          {descripcion}
         </p>
 
-        {/* Tags */}
+        {/* Tags (Tecnologías) */}
         <div className="flex flex-wrap gap-2 mb-4">
-          {tags.slice(0, 3).map((tag) => (
+          {tecnologias.slice(0, 3).map((tech, index) => (
             <span 
-              key={tag}
+              key={index}
               className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-md"
             >
-              {tag}
+              {tech}
             </span>
           ))}
-          {tags.length > 3 && (
+          {tecnologias.length > 3 && (
             <span className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-md">
-              +{tags.length - 3}
+              +{tecnologias.length - 3}
             </span>
           )}
         </div>
@@ -105,17 +101,24 @@ const ProjectCard = ({
         <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">
             <Users className="w-4 h-4" />
-            <span>{teamSize}/{maxTeam}</span>
+            <span>{participantes} {participantes === 1 ? 'participante' : 'participantes'}</span>
           </div>
           <div className="flex items-center gap-1">
-            <Calendar className="w-4 h-4" />
-            <span>{daysLeft} días</span>
+            <Clock className="w-4 h-4" />
+            <span>{duracion}</span>
           </div>
+        </div>
+
+        {/* Modalidad badge */}
+        <div className="mb-4">
+          <Badge variant="outline" className="text-xs">
+            {modalidad}
+          </Badge>
         </div>
 
         {/* Action buttons */}
         <div className="flex gap-2">
-          <Link to={`/proyecto/${id}`} className="flex-1">
+          <Link to={`/proyecto/${encodeURIComponent(nombre)}`} className="flex-1">
             <Button className="w-full group/btn">
               Ver proyecto
               <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />

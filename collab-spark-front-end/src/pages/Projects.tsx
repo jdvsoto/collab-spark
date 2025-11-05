@@ -1,92 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, Sparkles, Rocket, Users, Clock, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Search, Filter, Sparkles, Rocket } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import ProjectCard from "@/components/ProjectCard";
+import CreateProjectModal from "@/components/CreateProjectModal";
+import { getMicroproyectos, getProyectosEscalables } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 
 const Projects = () => {
   const [activeTab, setActiveTab] = useState<'micro' | 'escalar'>('micro');
+  const [microProjects, setMicroProjects] = useState<any[]>([]);
+  const [scaleProjects, setScaleProjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const microProjects = [
-    {
-      id: "1",
-      title: "App para organizar eventos estudiantiles",
-      description: "Una app simple para que los estudiantes organicen fiestas, reuniones de estudio y actividades en la universidad.",
-      category: "Social",
-      tags: ["React Native", "Eventos", "Estudiantes"],
-      teamSize: 2,
-      maxTeam: 4,
-      daysLeft: 15,
-      location: "Remoto",
-      difficulty: "Fácil"
-    },
-    {
-      id: "2",
-      title: "Bot para recordar tareas de la casa",
-      description: "Un bot de WhatsApp que te recuerda hacer la limpieza, pagar cuentas y organizar tu espacio personal.",
-      category: "Productividad",
-      tags: ["Python", "WhatsApp API", "Automatización"],
-      teamSize: 1,
-      maxTeam: 3,
-      daysLeft: 20,
-      location: "Remoto",
-      difficulty: "Fácil"
-    },
-    {
-      id: "3",
-      title: "App para intercambiar ropa entre amigos",
-      description: "Plataforma para que amigos intercambien ropa que ya no usan, promoviendo la moda sostenible.",
-      category: "Sostenibilidad",
-      tags: ["React", "Moda", "Intercambio"],
-      teamSize: 3,
-      maxTeam: 5,
-      daysLeft: 25,
-      location: "Remoto",
-      difficulty: "Medio"
+  const categories = ["Todos", "Social", "Productividad", "Sostenibilidad", "Educación", "Negocios", "Salud", "Tecnología"];
+
+  const loadProjects = async () => {
+    setLoading(true);
+    try {
+      const [micro, escalables] = await Promise.all([
+        getMicroproyectos(),
+        getProyectosEscalables()
+      ]);
+      setMicroProjects(micro || []);
+      setScaleProjects(escalables || []);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los proyectos",
+        variant: "destructive",
+      });
+      setMicroProjects([]);
+      setScaleProjects([]);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  const scaleProjects = [
-    {
-      id: "4",
-      title: "Plataforma de tutorías entre estudiantes",
-      description: "Conecta estudiantes que necesitan ayuda con otros que dominan diferentes materias. Intercambio de conocimientos sin intermediarios.",
-      category: "Educación",
-      tags: ["Vue.js", "Educación", "P2P"],
-      teamSize: 2,
-      maxTeam: 6,
-      daysLeft: 30,
-      location: "Remoto",
-      difficulty: "Medio"
-    },
-    {
-      id: "5",
-      title: "Red social para pequeños negocios locales",
-      description: "Ayuda a pequeños negocios de barrio a conectarse con su comunidad y crecer juntos.",
-      category: "Negocios",
-      tags: ["React", "Geolocalización", "Comercio local"],
-      teamSize: 4,
-      maxTeam: 8,
-      daysLeft: 45,
-      location: "Remoto",
-      difficulty: "Difícil"
-    },
-    {
-      id: "6",
-      title: "App de bienestar mental para jóvenes",
-      description: "Herramientas digitales para el bienestar mental: ejercicios, recursos y conexión con profesionales.",
-      category: "Salud",
-      tags: ["React Native", "Salud mental", "IA"],
-      teamSize: 3,
-      maxTeam: 7,
-      daysLeft: 60,
-      location: "Remoto",
-      difficulty: "Difícil"
-    }
-  ];
+  useEffect(() => {
+    loadProjects();
+  }, []);
 
-  const categories = ["Todos", "Social", "Productividad", "Sostenibilidad", "Educación", "Negocios", "Salud"];
+  const handleProjectCreated = () => {
+    loadProjects();
+    toast({
+      title: "¡Éxito!",
+      description: "El proyecto ha sido creado correctamente",
+    });
+  };
+
+  const currentProjects = activeTab === 'micro' ? microProjects : scaleProjects;
+  
+  const filteredProjects = currentProjects.filter(project => {
+    if (!searchQuery) return true;
+    const search = searchQuery.toLowerCase();
+    return (
+      project.Nombre?.toLowerCase().includes(search) ||
+      project.Descripcion?.toLowerCase().includes(search) ||
+      project.Categoria?.toLowerCase().includes(search)
+    );
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -135,6 +111,8 @@ const Projects = () => {
               <input
                 type="text"
                 placeholder="Buscar proyectos..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
               />
             </div>
@@ -162,59 +140,33 @@ const Projects = () => {
 
       {/* Projects Grid */}
       <div className="container mx-auto px-6 py-12">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(activeTab === 'micro' ? microProjects : scaleProjects).map((project) => (
-            <Link 
-              key={project.id} 
-              to={`/proyecto/${project.id}`}
-              className="group block"
-            >
-              <div className="bg-card rounded-xl p-6 border border-border hover:border-primary/20 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-start justify-between mb-4">
-                  <Badge variant="secondary" className="text-xs">
-                    {project.category}
-                  </Badge>
-                  <Badge variant={activeTab === 'micro' ? 'outline' : 'default'} className="text-xs">
-                    {activeTab === 'micro' ? 'Microproyecto' : 'Para escalar'}
-                  </Badge>
-                </div>
-
-                <h3 className="text-xl font-semibold text-foreground mb-3 group-hover:text-primary transition-colors">
-                  {project.title}
-                </h3>
-                
-                <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
-                  {project.description}
-                </p>
-
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tags.slice(0, 3).map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      <span>{project.teamSize}/{project.maxTeam}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      <span>{project.daysLeft} días</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    <span>{project.location}</span>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Cargando proyectos...</p>
+          </div>
+        ) : filteredProjects.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProjects.map((project, index) => (
+              <ProjectCard
+                key={index}
+                nombre={project.Nombre}
+                tipo={project.Tipo}
+                duracion={project.Duracion}
+                modalidad={project.Modalidad}
+                tecnologias={Array.isArray(project.Tecnologias) ? project.Tecnologias : []}
+                categoria={project.Categoria}
+                participantes={project.Participantes}
+                descripcion={project.Descripcion}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">
+              {searchQuery ? "No se encontraron proyectos con ese criterio" : "No hay proyectos disponibles"}
+            </p>
+          </div>
+        )}
 
         {/* CTA */}
         <div className="text-center mt-16">
@@ -225,13 +177,25 @@ const Projects = () => {
             <p className="text-muted-foreground mb-6">
               Compártela con nuestra comunidad y encuentra colaboradores que quieren aprender y crecer contigo.
             </p>
-            <Button variant="default" size="lg" className="group">
+            <Button 
+              variant="default" 
+              size="lg" 
+              className="group"
+              onClick={() => setIsModalOpen(true)}
+            >
               Crear mi proyecto
               <Rocket className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </div>
       </div>
+
+      {/* Create Project Modal */}
+      <CreateProjectModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        onProjectCreated={handleProjectCreated}
+      />
     </div>
   );
 };
