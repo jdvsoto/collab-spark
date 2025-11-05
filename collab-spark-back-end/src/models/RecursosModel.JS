@@ -39,6 +39,25 @@ export class Recursos {
         return this.#requisitos;
     }
 
+    set nombre(nuevoNombre) {
+        this.#nombre = nuevoNombre;
+    }
+    set descripcion(nuevaDescripcion) {
+        this.#descripcion = nuevaDescripcion;
+    }
+    set tipo(nuevoTipo) {
+        this.#tipo = nuevoTipo;
+    }
+    set ubicacion(nuevaUbicacion) {
+        this.#ubicacion = nuevaUbicacion;
+    }
+    set duracion(nuevaDuracion) {
+        this.#duracion = nuevaDuracion;
+    }
+    set requisitos(nuevosRequisitos) {
+        this.#requisitos = nuevosRequisitos;
+    }
+
     toJSON() {
         return {
             nombre: this.#nombre,

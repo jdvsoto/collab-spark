@@ -17,6 +17,12 @@ export class Fondos extends Recursos {
     get fondos() {
         return this.#fondos;
     }
+    set fondos(nuevosFondos) {
+        this.#fondos = nuevosFondos;
+    }
+    set tipoFondo(nuevoTipoFondo) {
+        this.#tipoFondo = nuevoTipoFondo;
+    }
 
     toJSON() {
         return {
