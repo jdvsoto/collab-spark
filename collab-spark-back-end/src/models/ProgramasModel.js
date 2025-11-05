@@ -1,0 +1,28 @@
+import { Recursos } from "./RecursosModel.js";
+
+export class Programas extends Recursos {
+    #tipoPrograma;
+    #fondos;
+
+    constructor({ nombre, descripcion, tipo, ubicacion, duracion, requisitos, tipoPrograma, fondos }) {
+        super({ nombre, descripcion, tipo, ubicacion, duracion, requisitos });
+        this.#tipoPrograma = tipoPrograma;
+        this.#fondos = fondos;
+    }
+
+    get tipoPrograma() {
+        return this.#tipoPrograma;
+    }
+
+    get fondos() {
+        return this.#fondos;
+    }
+
+    toJSON() {
+        return {
+            ...super.toJSON(),
+            tipoPrograma: this.#tipoPrograma,
+            fondos: this.#fondos,
+        };
+    }
+}
