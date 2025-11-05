@@ -1,34 +1,25 @@
-import { Recursos } from "./RecursosModel.js";
+import mongoose from 'mongoose';
+import { recursoBaseSchema } from './RecursosModel.JS';
 
-export class Fondos extends Recursos {
-    #tipoFondo;
-    #fondos;
+// Schema de Fondos que extiende el schema base de recursos
+const fondosSchema = new mongoose.Schema({
+  ...recursoBaseSchema,
+  tipoFondo: {
+    type: String,
+    required: [true, 'El tipo de fondo es requerido'],
+    trim: true
+  },
+  fondos: {
+    type: String, // Mantener como String para soportar rangos como "10000€ - 50000€"
+    required: [true, 'Los fondos son requeridos'],
+    trim: true
+  }
+}, {
+  timestamps: true,
+  versionKey: false
+});
 
-    constructor({ nombre, descripcion, tipo, ubicacion, duracion, requisitos, tipoFondo, fondos }) {
-        super({ nombre, descripcion, tipo, ubicacion, duracion, requisitos });
-        this.#tipoFondo = tipoFondo;
-        this.#fondos = fondos;
-    }
+// Crear el modelo
+const Fondos = mongoose.model('Fondos', fondosSchema);
 
-    get tipoFondo() {
-        return this.#tipoFondo;
-    }
-
-    get fondos() {
-        return this.#fondos;
-    }
-    set fondos(nuevosFondos) {
-        this.#fondos = nuevosFondos;
-    }
-    set tipoFondo(nuevoTipoFondo) {
-        this.#tipoFondo = nuevoTipoFondo;
-    }
-
-    toJSON() {
-        return {
-            ...super.toJSON(),
-            tipoFondo: this.#tipoFondo,
-            fondos: this.#fondos,
-        };
-    }
-}
+export default Fondos;

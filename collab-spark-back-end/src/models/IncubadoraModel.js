@@ -1,30 +1,25 @@
-import { Recursos } from "./RecursosModel.js";
+import mongoose from 'mongoose';
+import { recursoBaseSchema } from './RecursosModel.JS';
 
+// Schema de Incubadora que extiende el schema base de recursos
+const incubadoraSchema = new mongoose.Schema({
+  ...recursoBaseSchema,
+  tipoIncubadora: {
+    type: String,
+    required: [true, 'El tipo de incubadora es requerido'],
+    trim: true
+  },
+  inversion: {
+    type: String, // Mantener como String para soportar "Hasta 30000€"
+    required: [true, 'La inversión es requerida'],
+    trim: true
+  }
+}, {
+  timestamps: true,
+  versionKey: false
+});
 
-export class Incubadora extends Recursos {
-    #tipoIncubadora;
-    #inversion;
+// Crear el modelo
+const Incubadora = mongoose.model('Incubadora', incubadoraSchema);
 
-    constructor({ nombre, descripcion, tipo, ubicacion, duracion, requisitos, tipoIncubadora, inversion }) {
-        super({ nombre, descripcion, tipo, ubicacion, duracion, requisitos });
-        this.#tipoIncubadora = tipoIncubadora;
-        this.#inversion = inversion;
-    }
-
-    get tipoIncubadora() {
-        return this.#tipoIncubadora;
-    }
-
-    get inversion() {
-        return this.#inversion;
-    }   
-
-    toJSON() {
-        return {
-            ...super.toJSON(),
-            tipoIncubadora: this.#tipoIncubadora,
-            inversion: this.#inversion,
-        };
-    }
-    
-}
+export default Incubadora;
