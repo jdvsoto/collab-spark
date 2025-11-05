@@ -1,71 +1,36 @@
-export class Recursos {
-    #nombre;
-    #descripcion;
-    #tipo;
-    #ubicacion;
-    #duracion;
-    #requisitos;
+import mongoose from 'mongoose';
 
-    constructor({ nombre, descripcion, tipo, ubicacion, duracion, requisitos }) {
-        this.#nombre = nombre;
-        this.#descripcion = descripcion;
-        this.#tipo = tipo;
-        this.#ubicacion = ubicacion;
-        this.#duracion = duracion;
-        this.#requisitos = requisitos;
-    }
+// Schema base para todos los recursos
+const recursoBaseSchema = {
+  nombre: {
+    type: String,
+    required: [true, 'El nombre es requerido'],
+    trim: true
+  },
+  descripcion: {
+    type: String,
+    required: [true, 'La descripción es requerida'],
+    trim: true
+  },
+  tipo: {
+    type: String,
+    required: [true, 'El tipo es requerido'],
+    trim: true
+  },
+  ubicacion: {
+    type: String,
+    required: [true, 'La ubicación es requerida'],
+    trim: true
+  },
+  duracion: {
+    type: String,
+    required: [true, 'La duración es requerida'],
+    trim: true
+  },
+  requisitos: {
+    type: mongoose.Schema.Types.Mixed, // Puede ser String o Array
+    required: [true, 'Los requisitos son requeridos']
+  }
+};
 
-    get nombre() {
-        return this.#nombre;
-    }
-
-    get descripcion() {
-        return this.#descripcion;
-    }
-
-    get tipo() {
-        return this.#tipo;
-    }
-
-    get ubicacion() {
-        return this.#ubicacion;
-    } 
-
-    get duracion() {
-        return this.#duracion;
-    }
-
-    get requisitos() {
-        return this.#requisitos;
-    }
-
-    set nombre(nuevoNombre) {
-        this.#nombre = nuevoNombre;
-    }
-    set descripcion(nuevaDescripcion) {
-        this.#descripcion = nuevaDescripcion;
-    }
-    set tipo(nuevoTipo) {
-        this.#tipo = nuevoTipo;
-    }
-    set ubicacion(nuevaUbicacion) {
-        this.#ubicacion = nuevaUbicacion;
-    }
-    set duracion(nuevaDuracion) {
-        this.#duracion = nuevaDuracion;
-    }
-    set requisitos(nuevosRequisitos) {
-        this.#requisitos = nuevosRequisitos;
-    }
-
-    toJSON() {
-        return {
-            nombre: this.#nombre,
-            descripcion: this.#descripcion,
-            tipo: this.#tipo,
-            ubicacion: this.#ubicacion,
-            duracion: this.#duracion,
-            requisitos: this.#requisitos,
-        };
-    }
-}
+export { recursoBaseSchema };
