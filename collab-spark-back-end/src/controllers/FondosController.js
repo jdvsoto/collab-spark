@@ -1,60 +1,65 @@
-import { Fondos } from "../models/FondosModel.js";
-
-// Array en memoria para almacenar los fondos
-export const fondos = [];
+import Fondos from "../models/FondosModel.js";
 
 /**
- * Crea un nuevo fondo y lo añade al array.
+ * Crea un nuevo fondo y lo guarda en MongoDB
  */
-export const createFondo = (data) => {
-  // Validación simple basada en el constructor [cite: 8]
-  if (!data.nombre || !data.tipoFondo || data.fondos === undefined) { 
-    throw new Error(
-      "Faltan datos (nombre, tipoFondo, fondos) para crear el fondo"
+export const createFondo = async (data) => {
+  try {
+    if (!data.nombre || !data.tipoFondo || data.fondos === undefined) {
+      throw new Error(
+        "Faltan datos (nombre, tipoFondo, fondos) para crear el fondo"
+      );
+    }
+
+    const newFondo = new Fondos(data);
+    await newFondo.save();
+    return newFondo;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Devuelve todos los fondos desde MongoDB
+ */
+export const getFondos = async () => {
+  try {
+    return await Fondos.find();
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Elimina un fondo por su nombre
+ */
+export const deleteFondo = async (nombre) => {
+  try {
+    const result = await Fondos.findOneAndDelete({ nombre: nombre });
+    return result ? true : false;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Actualiza un fondo por su nombre
+ */
+export const updateFondo = async (nombre, updatedData) => {
+  try {
+    const fondo = await Fondos.findOneAndUpdate(
+      { nombre: nombre },
+      updatedData,
+      { new: true, runValidators: true }
     );
+
+    if (!fondo) {
+      throw new Error("Fondo no encontrado");
+    }
+
+    console.log("Fondo actualizado:", fondo);
+    return fondo;
+  } catch (error) {
+    throw error;
   }
-
-  // El constructor de Fondos espera un objeto [cite: 8]
-  const newFondo = new Fondos(data);
-  fondos.push(newFondo);
-  return newFondo.toJSON();
-};
-
-/**
- * Devuelve todos los fondos.
- */
-export const getFondos = () => {
-  return fondos.map((f) => f.toJSON());
-};
-
-/**
- * Elimina un fondo por su nombre.
- * (Asume que la clase base 'Recursos' hace 'nombre' accesible)
- */
-export const deleteFondo = (nombre) => {
-  const index = fondos.findIndex((f) => f.nombre === nombre);
-  if (index !== -1) {
-    fondos.splice(index, 1);
-    return true;
-  }
-  return false;
-};
-
-/**
- * Actualiza un fondo.
- * Sigue el patrón del ejemplo usando Object.assign.
- */
-export const updateFondo = (nombre, updatedData) => {
-  const fondo = fondos.find((f) => f.nombre === nombre);
-  if (!fondo) {
-    throw new Error("Fondo no encontrado");
-  }
-
-  // NOTA: Object.assign solo actualizará propiedades públicas (de 'Recursos').
-  // No puede actualizar los campos privados '#tipoFondo' o '#fondos' [cite: 9, 10]
-  // porque los modelos no tienen setters.
-  Object.assign(fondo, updatedData);
-
-  console.log("Fondo actualizado:", fondo);
-  return fondo.toJSON();
 };
