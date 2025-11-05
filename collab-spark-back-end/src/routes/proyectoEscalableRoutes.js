@@ -9,9 +9,9 @@ import {
 export function proyectoEscalableRoutes() {
   const router = Router();
 
-  router.post("/create-proyecto-escalable", (req, res) => {
+  router.post("/create-proyecto-escalable", async (req, res) => {
     try {
-      const nuevoProyecto = createProyectoEscalable(req.body);
+      const nuevoProyecto = await createProyectoEscalable(req.body);
       return res.status(201).json({
         success: true,
         proyecto: nuevoProyecto,
@@ -26,32 +26,46 @@ export function proyectoEscalableRoutes() {
     }
   });
 
-  router.get("/get-proyectos-escalables", (req, res) => {
-    const proyectos = getProyectosEscalables();
-    return res.status(200).json({
-      success: true,
-      proyectos,
-    });
-  });
-
-  router.delete("/delete-proyecto-escalable", (req, res) => {
-    const deleted = deleteProyectoEscalable(req.body.nombre);
-    if (deleted) {
+  router.get("/get-proyectos-escalables", async (req, res) => {
+    try {
+      const proyectos = await getProyectosEscalables();
       return res.status(200).json({
         success: true,
-        message: "Proyecto escalable eliminado",
+        proyectos,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        error: err.message || "Error al obtener proyectos escalables",
       });
     }
-    return res.status(404).json({
-      success: false,
-      error: "Proyecto escalable no encontrado",
-    });
   });
 
-  router.put("/update-proyecto-escalable/:nombre", (req, res) => {
+  router.delete("/delete-proyecto-escalable", async (req, res) => {
+    try {
+      const deleted = await deleteProyectoEscalable(req.body.nombre);
+      if (deleted) {
+        return res.status(200).json({
+          success: true,
+          message: "Proyecto escalable eliminado",
+        });
+      }
+      return res.status(404).json({
+        success: false,
+        error: "Proyecto escalable no encontrado",
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        error: err.message || "Error al eliminar proyecto escalable",
+      });
+    }
+  });
+
+  router.put("/update-proyecto-escalable/:nombre", async (req, res) => {
     try {
       const nombreABuscar = req.params.nombre;
-      const updatedProyecto = updateProyectoEscalable(nombreABuscar, req.body);
+      const updatedProyecto = await updateProyectoEscalable(nombreABuscar, req.body);
       return res.status(200).json({
         success: true,
         proyecto: updatedProyecto,

@@ -5,17 +5,18 @@ import {
     deleteMicroproyecto,
     updateMicroproyecto,
 } from "../controllers/MicroproyectosController.js";
+
 export function microproyectosRoutes() {
     const router = Router();
     
-    router.post("/create-microproyecto", (req, res) => {
+    router.post("/create-microproyecto", async (req, res) => {
         try {
-            const nuevoMicroproyecto = createMicroproyecto(req.body);
+            const nuevoMicroproyecto = await createMicroproyecto(req.body);
             return res.status(201).json({
                 success: true,
                 microproyecto: nuevoMicroproyecto,
             });
-        }catch (err) {
+        } catch (err) {
             const status =
                 err.message && err.message.includes("Faltan datos") ? 400 : 500;
             return res.status(status).json({
@@ -25,31 +26,46 @@ export function microproyectosRoutes() {
         }
     });
 
-    router.get("/get-microproyectos", (req, res) => {
-        const microproyectos = getMicroproyectos();
-        return res.status(200).json({
-            success: true,
-            microproyectos,
-        });
-    }); 
-    router.delete("/delete-microproyecto", (req, res) => {
-        const deleted = deleteMicroproyecto(req.body.nombre);
-        if (deleted) {
+    router.get("/get-microproyectos", async (req, res) => {
+        try {
+            const microproyectos = await getMicroproyectos();
             return res.status(200).json({
                 success: true,
-                message: "Microproyecto eliminado",
+                microproyectos,
+            });
+        } catch (err) {
+            return res.status(500).json({
+                success: false,
+                error: err.message || "Error al obtener microproyectos",
             });
         }
-        return res.status(404).json({
-            success: false,
-            error: "Microproyecto no encontrado",
-        });
+    }); 
+    
+    router.delete("/delete-microproyecto", async (req, res) => {
+        try {
+            const deleted = await deleteMicroproyecto(req.body.nombre);
+            if (deleted) {
+                return res.status(200).json({
+                    success: true,
+                    message: "Microproyecto eliminado",
+                });
+            }
+            return res.status(404).json({
+                success: false,
+                error: "Microproyecto no encontrado",
+            });
+        } catch (err) {
+            return res.status(500).json({
+                success: false,
+                error: err.message || "Error al eliminar microproyecto",
+            });
+        }
     });
 
-    router.put("/update-microproyecto/:nombre", (req, res) => {
+    router.put("/update-microproyecto/:nombre", async (req, res) => {
         try {
             const nombreABuscar = req.params.nombre;
-            const updatedMicroproyecto = updateMicroproyecto(nombreABuscar, req.body);
+            const updatedMicroproyecto = await updateMicroproyecto(nombreABuscar, req.body);
             return res.status(200).json({
                 success: true,
                 microproyecto: updatedMicroproyecto,
@@ -63,5 +79,6 @@ export function microproyectosRoutes() {
             });
         } 
     });
+    
     return router;
 }

@@ -1,58 +1,56 @@
-import {
-  ProyectoEscalable,
-  proyectosEscalables,
-} from "../models/ProyectoEscalableModel.js";
+import ProyectoEscalable from "../models/ProyectoEscalableModel.js";
 
-export const createProyectoEscalable = (proyectoData) => {
-  if (!proyectoData.Etapas || !proyectoData.Presupuesto) {
-    throw new Error("Faltan datos para crear el proyecto escalable");
+// Crear un nuevo proyecto escalable
+export const createProyectoEscalable = async (proyectoData) => {
+  try {
+    if (!proyectoData.Etapas || !proyectoData.Presupuesto) {
+      throw new Error("Faltan datos para crear el proyecto escalable");
+    }
+
+    const newProyecto = new ProyectoEscalable(proyectoData);
+    await newProyecto.save();
+    return newProyecto;
+  } catch (error) {
+    throw error;
   }
-
-  const {
-    Nombre,
-    Duracion,
-    Modalidad,
-    Tecnologias,
-    Categoria,
-    Participantes,
-    Descripcion,
-    Etapas,
-    Presupuesto,
-  } = proyectoData;
-  const newProyecto = new ProyectoEscalable(
-    Nombre,
-    Duracion,
-    Modalidad,
-    Tecnologias,
-    Categoria,
-    Participantes,
-    Descripcion,
-    Etapas,
-    Presupuesto
-  );
-  proyectosEscalables.push(newProyecto);
-  return newProyecto.toJSON();
 };
 
-export const getProyectosEscalables = () => {
-  return proyectosEscalables.map((proyecto) => proyecto.toJSON());
+// Obtener todos los proyectos escalables
+export const getProyectosEscalables = async () => {
+  try {
+    return await ProyectoEscalable.find();
+  } catch (error) {
+    throw error;
+  }
 };
 
-export const deleteProyectoEscalable = (nombre) => {
-    const index = proyectosEscalables.findIndex(proyecto => proyecto.Nombre === nombre);
-    if (index !== -1) {
-        proyectosEscalables.splice(index, 1);
-        return true;
-    }
-    return false;
+// Eliminar un proyecto escalable por nombre
+export const deleteProyectoEscalable = async (nombre) => {
+  try {
+    const result = await ProyectoEscalable.findOneAndDelete({ Nombre: nombre });
+    return result ? true : false;
+  } catch (error) {
+    throw error;
+  }
 };
 
-export const updateProyectoEscalable = (nombre, updatedData) => {
-    const proyecto = proyectosEscalables.find(proyecto => proyecto.Nombre === nombre);
+// Actualizar un proyecto escalable por nombre
+export const updateProyectoEscalable = async (nombre, updatedData) => {
+  try {
+    const proyecto = await ProyectoEscalable.findOneAndUpdate(
+      { Nombre: nombre },
+      updatedData,
+      { new: true, runValidators: true }
+    );
+    
     if (!proyecto) {
-        throw new Error("Proyecto escalable no encontrado");
+      throw new Error("Proyecto escalable no encontrado");
     }
-    Object.assign(proyecto, updatedData);
+    
     console.log('Proyecto escalable actualizado:', proyecto);
-    return proyecto.toJSON();
+    return proyecto;
+  } catch (error) {
+    throw error;
+  }
 };
+

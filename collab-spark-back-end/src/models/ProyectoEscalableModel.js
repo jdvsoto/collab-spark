@@ -1,30 +1,36 @@
-import { Proyectos } from "./ProyectosModel.js";
-export class ProyectoEscalable extends Proyectos{
-    #etapas
-    #presupuesto
+import mongoose from 'mongoose';
+import { proyectoBaseSchema } from './ProyectosModel.js';
 
-    constructor(Nombre, Duracion, Modalidad, Tecnologias, Categoria, Participantes, Descripcion, Etapas, Presupuesto){
-        super(Nombre, "Escalable", Duracion, Modalidad, Tecnologias, Categoria, Participantes, Descripcion)
-        this.#etapas = Etapas;
-        this.#presupuesto = Presupuesto;
+// Schema de Proyecto Escalable que extiende el schema base
+const proyectoEscalableSchema = new mongoose.Schema({
+  ...proyectoBaseSchema,
+  Etapas: {
+    type: String,
+    required: [true, 'Las etapas son requeridas'],
+    validate: {
+      validator: function(v) {
+        return v && v.length > 0;
+      },
+      message: 'Debe haber al menos una etapa'
     }
-    get Etapas(){
-        return this.#etapas;
-    }
-    get Presupuesto(){
-        return this.#presupuesto;
-    }
+  },
+  Presupuesto: {
+    type: String,
+    required: [true, 'El presupuesto es requerido'],
+    min: [0, 'El presupuesto no puede ser negativo']
+  }
+}, {
+  timestamps: true,
+  versionKey: false
+});
 
-    set Etapas(value) { this.#etapas = value; }
-    set Presupuesto(value) { this.#presupuesto = value; }
-    
+// Establecer el tipo como 'Escalable' automáticamente
+proyectoEscalableSchema.pre('save', function(next) {
+  this.Tipo = 'Escalable';
+  next();
+});
 
-    toJSON(){
-        return {
-            ...super.toJSON(),
-            Etapas: this.#etapas,
-            Presupuesto: this.#presupuesto
-        };
-    }
-}
-export const proyectosEscalables = [];
+// Crear el modelo
+const ProyectoEscalable = mongoose.model('ProyectoEscalable', proyectoEscalableSchema);
+
+export default ProyectoEscalable;

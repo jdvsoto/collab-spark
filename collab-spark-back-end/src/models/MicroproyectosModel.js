@@ -1,24 +1,26 @@
-import { Proyectos } from "./ProyectosModel.js";
-export class Microproyectos extends Proyectos{
-    #objetivo
+import mongoose from 'mongoose';
+import { proyectoBaseSchema } from './ProyectosModel.js';
 
-     constructor(Nombre, Duracion, Modalidad, Tecnologias, Categoria, Participantes, Descripcion, objetivo) {
-        super(Nombre, "Microproyecto", Duracion, Modalidad, Tecnologias, Categoria, Participantes, Descripcion);
-        this.#objetivo = objetivo;
-    }
-    get objetivo(){
-        return this.#objetivo;
-    }
-    set objetivo(value) { 
-        this.#objetivo = value; 
-    }
-    
-    toJSON() {
-        return {
-            ...super.toJSON(),
-            objetivo: this.#objetivo
-        };
-    }
-}
+// Schema de Microproyectos que extiende el schema base
+const microproyectoSchema = new mongoose.Schema({
+  ...proyectoBaseSchema,
+  objetivo: {
+    type: String,
+    required: [true, 'El objetivo es requerido'],
+    trim: true
+  }
+}, {
+  timestamps: true,
+  versionKey: false
+});
 
-export const microproyectos = [];
+// Establecer el tipo como 'Microproyecto' automáticamente
+microproyectoSchema.pre('save', function(next) {
+  this.Tipo = 'Microproyecto';
+  next();
+});
+
+// Crear el modelo
+const Microproyecto = mongoose.model('Microproyecto', microproyectoSchema);
+
+export default Microproyecto;
