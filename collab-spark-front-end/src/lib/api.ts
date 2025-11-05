@@ -81,3 +81,81 @@ export async function createProyectoEscalable(proyectoData: any) {
   const data = await response.json();
   return data.proyecto;
 }
+
+// Fondos API
+export async function getFondos() {
+  const response = await fetch(`${API_BASE_URL}/fondos/get-fondos`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch fondos");
+  }
+  const data = await response.json();
+  return data.fondos;
+}
+
+export async function createFondo(fondoData: any) {
+  const response = await fetch(`${API_BASE_URL}/fondos/create-fondo`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(fondoData),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to create fondo");
+  }
+  const data = await response.json();
+  return data.fondo;
+}
+
+// Incubadoras API
+export async function getIncubadoras() {
+  const response = await fetch(`${API_BASE_URL}/incubadoras/get-incubadoras`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch incubadoras");
+  }
+  const data = await response.json();
+  return data.incubadoras;
+}
+
+export async function createIncubadora(incubadoraData: any) {
+  const response = await fetch(`${API_BASE_URL}/incubadoras/create-incubadora`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(incubadoraData),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to create incubadora");
+  }
+  const data = await response.json();
+  return data.incubadora;
+}
+
+// Programas API
+export async function getProgramas() {
+  const response = await fetch(`${API_BASE_URL}/programas/get-programas`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch programas");
+  }
+  const data = await response.json();
+  return data.programas;
+}
+
+export async function createPrograma(programaData: any) {
+  const response = await fetch(`${API_BASE_URL}/programas/create-programa`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(programaData),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to create programa");
+  }
+  const data = await response.json();
+  return data.programa;
+}

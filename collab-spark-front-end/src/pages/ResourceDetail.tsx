@@ -1,135 +1,104 @@
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { 
   MapPin, 
   Calendar, 
   DollarSign, 
-  Users, 
-  CheckCircle, 
   ArrowLeft, 
+  ArrowRight,
   ExternalLink, 
   Mail,
-  Rocket,
-  Sparkles,
+  Building,
   Target,
-  TrendingUp,
-  Heart,
-  Share2,
-  Bookmark,
-  Star,
-  Zap,
-  Lightbulb,
-  Award,
-  Globe,
-  Clock,
-  ArrowRight,
-  Building2,
-  GraduationCap,
-  Handshake,
-  Users2,
-  Target as TargetIcon,
-  CheckCircle2
+  Lightbulb
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import { getFondos, getIncubadoras, getProgramas } from "@/lib/api";
 
 const ResourceDetail = () => {
   const { id } = useParams();
+  const [resource, setResource] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data - en una app real esto vendría de una API
-  const resource = {
-    id: "1",
-    name: "StartupLab Madrid",
-    type: "Incubadora",
-    description: "Ayudamos a jóvenes emprendedores a convertir sus ideas en negocios reales. Ofrecemos espacio de trabajo, mentores y conexiones con inversores y otros emprendedores. Nuestro programa está diseñado específicamente para personas que están empezando su camino emprendedor.",
-    longDescription: "StartupLab Madrid es una incubadora especializada en apoyar a jóvenes emprendedores en las primeras etapas de sus proyectos. Creemos que todos tenemos ideas increíbles, pero no todos tenemos las herramientas y conexiones para hacerlas realidad. Por eso hemos creado un espacio donde puedes aprender, experimentar y conectar con personas que han pasado por lo mismo que tú.",
-    focus: ["Tecnología", "Social", "Educación", "Sostenibilidad"],
-    support: [
-      "Espacio de trabajo compartido",
-      "Mentores expertos en diferentes áreas",
-      "Conexiones con inversores",
-      "Talleres y formación práctica",
-      "Red de emprendedores",
-      "Acceso a herramientas y software"
-    ],
-    location: "Madrid, España",
-    duration: "6 meses",
-    funding: "Hasta 25k€",
-    requirements: "Idea validada, equipo de 2+ personas, compromiso de tiempo completo",
-    applicationProcess: [
-      "Envía tu idea y equipo",
-      "Entrevista con nuestro equipo",
-      "Presentación ante mentores",
-      "Decisión final y onboarding"
-    ],
-    successStories: [
-      {
-        name: "EcoApp",
-        description: "App para reducir la huella de carbono personal",
-        funding: "50k€ en inversión",
-        team: "3 jóvenes de 22-24 años",
-        impact: "10k+ usuarios activos"
-      },
-      {
-        name: "StudyBuddy",
-        description: "Plataforma de tutorías entre estudiantes",
-        funding: "30k€ en inversión",
-        team: "2 estudiantes universitarios",
-        impact: "5k+ estudiantes ayudados"
+  useEffect(() => {
+    const loadResource = async () => {
+      setLoading(true);
+      try {
+        const resourceName = decodeURIComponent(id || "");
+
+        // Buscar en incubadoras
+        const incubadoras = await getIncubadoras();
+        let foundResource = incubadoras.find((r: any) => r.nombre === resourceName);
+        let resourceType = "incubadora";
+
+        // Si no se encuentra, buscar en fondos
+        if (!foundResource) {
+          const fondos = await getFondos();
+          foundResource = fondos.find((r: any) => r.nombre === resourceName);
+          resourceType = "fondo";
+        }
+
+        // Si no se encuentra, buscar en programas
+        if (!foundResource) {
+          const programas = await getProgramas();
+          foundResource = programas.find((r: any) => r.nombre === resourceName);
+          resourceType = "programa";
+        }
+
+        if (foundResource) {
+          setResource({ ...foundResource, resourceType });
+        }
+      } catch (error) {
+        console.error("Error loading resource:", error);
+      } finally {
+        setLoading(false);
       }
-    ],
-    contact: {
-      email: "hola@startuplabmadrid.com",
-      website: "https://startuplabmadrid.com",
-      phone: "+34 91 123 45 67"
-    },
-    nextDeadline: "15 de diciembre, 2024",
-    stats: {
-      startups: 45,
-      funding: "2.5M€",
-      successRate: "78%",
-      mentors: 25
-    },
-    program: {
-      phase1: {
-        title: "Validación y MVP",
-        duration: "2 meses",
-        focus: "Validar idea, construir MVP, primeros usuarios"
-      },
-      phase2: {
-        title: "Crecimiento y Tracción",
-        duration: "2 meses", 
-        focus: "Escalar, métricas, optimización"
-      },
-      phase3: {
-        title: "Inversión y Escalado",
-        duration: "2 meses",
-        focus: "Preparar ronda de inversión, expansión"
-      }
-    },
-    mentors: [
-      {
-        name: "Ana Martínez",
-        role: "Ex-Google, Fundadora de 3 startups",
-        expertise: "Product Strategy, Growth",
-        avatar: "/placeholder.svg"
-      },
-      {
-        name: "Carlos Rodríguez", 
-        role: "Inversor Ángel, 50+ inversiones",
-        expertise: "Financiación, Pitch",
-        avatar: "/placeholder.svg"
-      },
-      {
-        name: "Laura Sánchez",
-        role: "CMO en startups unicornio",
-        expertise: "Marketing, Branding",
-        avatar: "/placeholder.svg"
-      }
-    ]
+    };
+
+    loadResource();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-6 py-24">
+          <p className="text-center text-muted-foreground">Cargando recurso...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!resource) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-6 py-24">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4">Recurso no encontrado</h2>
+            <Link to="/recursos">
+              <Button>Volver a recursos</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const getFundingInfo = () => {
+    if (resource.fondos) return resource.fondos;
+    if (resource.inversion) return resource.inversion;
+    return "Consultar";
+  };
+
+  const getSpecificType = () => {
+    if (resource.tipoFondo) return resource.tipoFondo;
+    if (resource.tipoIncubadora) return resource.tipoIncubadora;
+    if (resource.tipoPrograma) return resource.tipoPrograma;
+    return resource.tipo;
   };
 
   return (
@@ -156,62 +125,34 @@ const ResourceDetail = () => {
             <div className="max-w-4xl mx-auto text-center mb-12">
               <div className="flex items-center justify-center gap-3 mb-6">
                 <Badge variant="secondary" className="text-sm">
-                  {resource.type}
+                  {getSpecificType()}
                 </Badge>
                 <Badge variant="default" className="text-sm">
-                  {resource.funding}
+                  {getFundingInfo()}
                 </Badge>
                 <Badge variant="outline" className="text-sm">
-                  {resource.duration}
+                  {resource.duracion}
                 </Badge>
               </div>
               
               <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-                {resource.name}
+                {resource.nombre}
               </h1>
               
               <p className="text-xl text-muted-foreground leading-relaxed max-w-3xl mx-auto mb-8">
-                {resource.description}
+                {resource.descripcion}
               </p>
-
-              {/* Stats */}
-              <div className="flex justify-center gap-8 mb-8">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">{resource.stats.startups}</div>
-                  <div className="text-sm text-muted-foreground">Startups</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">{resource.stats.funding}</div>
-                  <div className="text-sm text-muted-foreground">Financiación</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">{resource.stats.successRate}</div>
-                  <div className="text-sm text-muted-foreground">Tasa de éxito</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">{resource.stats.mentors}</div>
-                  <div className="text-sm text-muted-foreground">Mentores</div>
-                </div>
-              </div>
 
               {/* Action buttons */}
               <div className="flex gap-4 justify-center flex-wrap">
                 <Button size="lg" className="group">
                   <ExternalLink className="w-5 h-5 mr-2" />
-                  Aplicar ahora
+                  Más información
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <Button variant="outline" size="lg">
                   <Mail className="w-4 h-4 mr-2" />
                   Contactar
-                </Button>
-                <Button variant="ghost" size="lg">
-                  <Bookmark className="w-4 h-4 mr-2" />
-                  Guardar
-                </Button>
-                <Button variant="ghost" size="lg">
-                  <Share2 className="w-4 h-4 mr-2" />
-                  Compartir
                 </Button>
               </div>
             </div>
@@ -228,143 +169,32 @@ const ResourceDetail = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-2xl">
                     <Lightbulb className="w-6 h-6 text-primary" />
-                    Sobre nosotros
+                    Descripción
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground leading-relaxed text-lg">
-                    {resource.longDescription}
+                    {resource.descripcion}
                   </p>
                 </CardContent>
               </Card>
 
-              {/* Program Phases */}
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-2xl">
-                    <Rocket className="w-6 h-6 text-blue-500" />
-                    Programa de 6 meses
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-8">
-                    {Object.entries(resource.program).map(([phase, data], index) => (
-                      <div key={phase} className="flex gap-6">
-                        <div className="flex flex-col items-center">
-                          <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm">
-                            {index + 1}
-                          </div>
-                          {index < Object.keys(resource.program).length - 1 && (
-                            <div className="w-0.5 h-16 bg-border mt-2"></div>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="bg-blue-500/5 rounded-xl p-6 border border-blue-500/10">
-                            <h3 className="text-lg font-semibold text-foreground mb-2">
-                              {data.title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              {data.focus}
-                            </p>
-                            <Badge variant="outline" className="text-xs">
-                              {data.duration}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* What we offer */}
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-green-500/5 to-blue-500/5">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-2xl">
-                    <Target className="w-6 h-6 text-green-500" />
-                    ¿Qué ofrecemos?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    {resource.support.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3 p-4 bg-green-500/5 rounded-lg border border-green-500/10">
-                        <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm">{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Success stories */}
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-2xl">
-                    <Award className="w-6 h-6 text-purple-500" />
-                    Proyectos exitosos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    {resource.successStories.map((story, index) => (
-                      <div key={index} className="bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-xl p-6 border border-purple-500/10">
-                        <div className="flex items-start justify-between mb-4">
-                          <h3 className="text-xl font-semibold text-foreground">
-                            {story.name}
-                          </h3>
-                          <Badge variant="default" className="text-xs">
-                            Exitoso
-                          </Badge>
-                        </div>
-                        <p className="text-muted-foreground mb-4">
-                          {story.description}
-                        </p>
-                        <div className="grid md:grid-cols-3 gap-4 text-sm">
-                          <div className="flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-green-500" />
-                            <span className="font-medium">{story.funding}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Users2 className="w-4 h-4 text-blue-500" />
-                            <span>{story.team}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <TargetIcon className="w-4 h-4 text-purple-500" />
-                            <span>{story.impact}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Mentors */}
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-2xl">
-                    <GraduationCap className="w-6 h-6 text-orange-500" />
-                    Nuestros mentores
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {resource.mentors.map((mentor, index) => (
-                      <div key={index} className="flex items-start gap-4 p-4 bg-orange-500/5 rounded-lg border border-orange-500/10">
-                        <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-semibold">
-                          {mentor.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-foreground">{mentor.name}</h3>
-                          <p className="text-sm text-primary mb-2">{mentor.role}</p>
-                          <p className="text-xs text-muted-foreground">{mentor.expertise}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Requisitos */}
+              {resource.requisitos && (
+                <Card className="border-0 shadow-lg bg-gradient-to-br from-green-500/5 to-blue-500/5">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-2xl">
+                      <Target className="w-6 h-6 text-green-500" />
+                      Requisitos
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-foreground leading-relaxed">
+                      {resource.requisitos}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -372,109 +202,45 @@ const ResourceDetail = () => {
               {/* Quick Info */}
               <Card className="border-0 shadow-lg bg-gradient-to-br from-blue-500/5 to-purple-500/5">
                 <CardHeader>
-                  <CardTitle>Información rápida</CardTitle>
+                  <CardTitle>Información</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <MapPin className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">{resource.location}</span>
+                  <div className="flex items-start gap-3">
+                    <Building className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div>
+                      <div className="text-sm font-medium text-foreground">Tipo</div>
+                      <div className="text-sm text-muted-foreground">{getSpecificType()}</div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">{resource.duration}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <DollarSign className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">{resource.funding}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">Próxima convocatoria: {resource.nextDeadline}</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Requirements */}
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="w-5 h-5 text-primary" />
-                    Requisitos
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-foreground">
-                    {resource.requirements}
-                  </p>
-                </CardContent>
-              </Card>
-
-              {/* Focus areas */}
-              <Card className="border-0 shadow-lg bg-gradient-to-br from-green-500/5 to-blue-500/5">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-green-500" />
-                    Áreas de enfoque
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {resource.focus.map((area) => (
-                      <Badge key={area} variant="outline">
-                        {area}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Application process */}
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Handshake className="w-5 h-5 text-blue-500" />
-                    Proceso de aplicación
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {resource.applicationProcess.map((step, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
-                          {index + 1}
-                        </div>
-                        <span className="text-sm">{step}</span>
+                  
+                  {resource.ubicacion && (
+                    <div className="flex items-start gap-3">
+                      <MapPin className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <div className="text-sm font-medium text-foreground">Ubicación</div>
+                        <div className="text-sm text-muted-foreground">{resource.ubicacion}</div>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Contact */}
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle>Contacto</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
-                      <span>{resource.contact.email}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Globe className="w-4 h-4 text-muted-foreground" />
-                      <a href={resource.contact.website} className="text-primary hover:underline">
-                        Visitar sitio web
-                      </a>
+                  )}
+                  
+                  {resource.duracion && (
+                    <div className="flex items-start gap-3">
+                      <Calendar className="w-5 h-5 text-muted-foreground mt-0.5" />
+                      <div>
+                        <div className="text-sm font-medium text-foreground">Duración</div>
+                        <div className="text-sm text-muted-foreground">{resource.duracion}</div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Building2 className="w-4 h-4 text-muted-foreground" />
-                      <span>{resource.contact.phone}</span>
+                  )}
+                  
+                  <div className="flex items-start gap-3">
+                    <DollarSign className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div>
+                      <div className="text-sm font-medium text-foreground">
+                        {resource.tipoFondo ? 'Fondos' : resource.tipoIncubadora ? 'Inversión' : 'Fondos'}
+                      </div>
+                      <div className="text-sm text-muted-foreground">{getFundingInfo()}</div>
                     </div>
-                    <Button className="w-full">
-                      <ExternalLink className="w-4 h-4 mr-2" />
-                      Aplicar ahora
-                    </Button>
                   </div>
                 </CardContent>
               </Card>

@@ -3,6 +3,14 @@ import { ArrowRight, Users, Lightbulb, Target } from "lucide-react";
 import heroImage from "@/assets/hero-collaboration.jpg";
 
 const Hero = () => {
+  const handleViewProjects = () => {
+    window.location.href = "/proyectos";
+  };
+
+  const handleExploreResources = () => {
+    window.location.href = "/recursos";
+  }
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-primary/5 to-accent/10">
       {/* Background decoration */}
@@ -28,11 +36,11 @@ const Hero = () => {
 
             {/* CTA Buttons */}
             <div className="flex gap-4 flex-wrap">
-              <Button variant="hero" size="lg" className="group">
+              <Button variant="hero" size="lg" className="group" onClick={handleViewProjects}>
                 Ver proyectos
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" onClick={handleExploreResources}>
                 Explorar recursos
               </Button>
             </div>

@@ -62,18 +62,6 @@ const Navbar = () => {
             </div>
           )}
 
-          {/* Search Bar */}
-          {!isAuthPage && (
-            <div className="hidden lg:flex items-center gap-2 bg-muted rounded-lg px-4 py-2 w-80">
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                placeholder="Buscar proyectos, recursos..."
-                className="bg-transparent border-none outline-none flex-1 text-sm placeholder:text-muted-foreground"
-              />
-            </div>
-          )}
-
           {/* Actions */}
           <div className="flex items-center gap-3">
             {!isAuthPage && (

@@ -15,6 +15,7 @@ const Projects = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("Todos");
 
   const categories = ["Todos", "Social", "Productividad", "Sostenibilidad", "Educación", "Negocios", "Salud", "Tecnología"];
 
@@ -55,13 +56,17 @@ const Projects = () => {
   const currentProjects = activeTab === 'micro' ? microProjects : scaleProjects;
   
   const filteredProjects = currentProjects.filter(project => {
-    if (!searchQuery) return true;
-    const search = searchQuery.toLowerCase();
-    return (
-      project.Nombre?.toLowerCase().includes(search) ||
-      project.Descripcion?.toLowerCase().includes(search) ||
-      project.Categoria?.toLowerCase().includes(search)
-    );
+    // Filtro por búsqueda
+    const matchesSearch = !searchQuery || 
+      project.Nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.Descripcion?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      project.Categoria?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Filtro por categoría
+    const matchesCategory = selectedCategory === "Todos" || 
+      project.Categoria?.toLowerCase() === selectedCategory.toLowerCase();
+    
+    return matchesSearch && matchesCategory;
   });
 
   return (
@@ -127,9 +132,10 @@ const Projects = () => {
             {categories.map((category) => (
               <Button
                 key={category}
-                variant={category === "Todos" ? "default" : "ghost"}
+                variant={category === selectedCategory ? "default" : "ghost"}
                 size="sm"
                 className="rounded-full"
+                onClick={() => setSelectedCategory(category)}
               >
                 {category}
               </Button>
