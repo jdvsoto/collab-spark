@@ -56,6 +56,19 @@ export async function createMicroproyecto(microproyectoData: any) {
   return data.microproyecto;
 }
 
+export async function deleteMicroproyecto(microproyectoName: string) {
+  const response = await fetch(`${API_BASE_URL}/microproyectos/delete-microproyecto`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ nombre: microproyectoName }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to delete microproyecto");
+  }
+}
 // Proyectos Escalables API
 export async function getProyectosEscalables() {
   const response = await fetch(`${API_BASE_URL}/proyecto-escalable/get-proyectos-escalables`);
@@ -80,6 +93,20 @@ export async function createProyectoEscalable(proyectoData: any) {
   }
   const data = await response.json();
   return data.proyecto;
+}
+
+export async function deleteProyectoEscalable(proyectoName: string) {
+  const response = await fetch(`${API_BASE_URL}/proyecto-escalable/delete-proyecto-escalable`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ nombre: proyectoName }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to delete proyecto escalable");
+  }
 }
 
 // Fondos API
@@ -108,6 +135,20 @@ export async function createFondo(fondoData: any) {
   return data.fondo;
 }
 
+export async function deleteFondo(fondoName: string) {
+  const response = await fetch(`${API_BASE_URL}/fondos/delete-fondo`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ nombre: fondoName }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to delete fondo");
+  }
+}
+
 // Incubadoras API
 export async function getIncubadoras() {
   const response = await fetch(`${API_BASE_URL}/incubadoras/get-incubadoras`);
@@ -134,6 +175,20 @@ export async function createIncubadora(incubadoraData: any) {
   return data.incubadora;
 }
 
+export async function deleteIncubadora(incubadoraName: string) {
+  const response = await fetch(`${API_BASE_URL}/incubadoras/delete-incubadora`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ nombre: incubadoraName }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to delete incubadora");
+  }
+}
+
 // Programas API
 export async function getProgramas() {
   const response = await fetch(`${API_BASE_URL}/programas/get-programas`);
@@ -158,4 +213,18 @@ export async function createPrograma(programaData: any) {
   }
   const data = await response.json();
   return data.programa;
+}
+
+export async function deletePrograma(programaName: string) {
+  const response = await fetch(`${API_BASE_URL}/programas/delete-programa`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ nombre: programaName }),
+  });
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to delete programa");
+  }
 }

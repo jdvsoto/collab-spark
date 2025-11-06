@@ -5,7 +5,7 @@ import { proyectoBaseSchema } from './ProyectosModel.js';
 const proyectoEscalableSchema = new mongoose.Schema({
   ...proyectoBaseSchema,
   Etapas: {
-    type: String,
+    type: [String],
     required: [true, 'Las etapas son requeridas'],
     validate: {
       validator: function(v) {

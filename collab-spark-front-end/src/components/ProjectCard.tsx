@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Users, ArrowRight, Clock } from "lucide-react";
+import { Heart, Users, ArrowRight, Clock, Trash } from "lucide-react";
 import { Link } from "react-router-dom";
+import { deleteMicroproyecto, deleteProyectoEscalable } from "@/lib/api";
+import { toast } from "@/hooks/use-toast";
 
 interface ProjectCardProps {
   nombre: string;
@@ -14,6 +16,8 @@ interface ProjectCardProps {
   descripcion: string;
   isLiked?: boolean;
   featured?: boolean;
+  onDelete?: () => void;
+  projectType?: 'micro' | 'escalar'; // Tipo de proyecto para saber qué API usar
 }
 
 const ProjectCard = ({
@@ -26,8 +30,36 @@ const ProjectCard = ({
   participantes,
   descripcion,
   isLiked = false,
-  featured = false
+  featured = false,
+  onDelete,
+  projectType = 'micro' // Por defecto es microproyecto
 }: ProjectCardProps) => {
+  const handleTrashClick = async () => {
+    try {
+      // Usar la función correcta según el tipo de proyecto
+      if (projectType === 'micro') {
+        await deleteMicroproyecto(nombre);
+      } else {
+        await deleteProyectoEscalable(nombre);
+      }
+      
+      toast({
+        title: "Proyecto eliminado",
+        description: `El proyecto "${nombre}" ha sido eliminado correctamente.`,
+      });
+      // Llamar al callback para actualizar la lista en el componente padre
+      if (onDelete) {
+        onDelete();
+      }
+    } catch (error) {
+      console.error('Error al eliminar el proyecto:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el proyecto. Intenta de nuevo.",
+        variant: "destructive",
+      });
+    }
+  }
   return (
     <div className={`group relative bg-card rounded-2xl overflow-hidden shadow-card hover:shadow-glow transition-all duration-500 border ${
       featured ? 'border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5' : 'border-border/50'
@@ -42,9 +74,9 @@ const ProjectCard = ({
         </div>
       )}
 
-      {/* Like button */}
+      {/* Trash button */}
       <button className="absolute top-4 right-4 z-10 w-8 h-8 bg-background/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-background transition-colors">
-        <Heart className={`w-4 h-4 ${isLiked ? 'fill-red-500 text-red-500' : 'text-foreground'}`} />
+        <Trash className={`w-4 h-4 ${isLiked ? 'fill-red-500 text-red-500' : 'text-foreground'}`} onClick={handleTrashClick}/>
       </button>
 
       {/* Image */}

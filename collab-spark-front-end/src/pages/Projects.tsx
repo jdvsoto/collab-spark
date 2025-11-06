@@ -163,6 +163,8 @@ const Projects = () => {
                 categoria={project.Categoria}
                 participantes={project.Participantes}
                 descripcion={project.Descripcion}
+                onDelete={loadProjects}
+                projectType={activeTab}
               />
             ))}
           </div>

@@ -195,6 +195,8 @@ const Resources = () => {
                 tipoIncubadora={resource.tipoIncubadora}
                 inversion={resource.inversion}
                 tipoPrograma={resource.tipoPrograma}
+                onDelete={loadResources}
+                resourceType={activeTab}
               />
             ))}
           </div>

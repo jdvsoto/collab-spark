@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { recursoBaseSchema } from './RecursosModel.JS';
+import { recursoBaseSchema } from './RecursosModel.js';
 
 // Schema de Fondos que extiende el schema base de recursos
 const fondosSchema = new mongoose.Schema({
