@@ -1,60 +1,65 @@
-import { Programas } from "../models/ProgramasModel.js"; 
-
-// Array en memoria para almacenar los programas
-export const programas = [];
+import Programas from "../models/ProgramasModel.js";
 
 /**
- * Crea un nuevo programa y lo añade al array.
+ * Crea un nuevo programa y lo guarda en MongoDB
  */
-export const createPrograma = (data) => {
-  // Validación simple basada en el constructor [cite: 14]
-  if (!data.nombre || !data.tipoPrograma || data.fondos === undefined) { 
-    throw new Error(
-      "Faltan datos (nombre, tipoPrograma, fondos) para crear el programa"
+export const createPrograma = async (data) => {
+  try {
+    if (!data.nombre || !data.tipoPrograma || data.fondos === undefined) {
+      throw new Error(
+        "Faltan datos (nombre, tipoPrograma, fondos) para crear el programa"
+      );
+    }
+
+    const newPrograma = new Programas(data);
+    await newPrograma.save();
+    return newPrograma;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Devuelve todos los programas desde MongoDB
+ */
+export const getProgramas = async () => {
+  try {
+    return await Programas.find();
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Elimina un programa por su nombre
+ */
+export const deletePrograma = async (nombre) => {
+  try {
+    const result = await Programas.findOneAndDelete({ nombre: nombre });
+    return result ? true : false;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Actualiza un programa por su nombre
+ */
+export const updatePrograma = async (nombre, updatedData) => {
+  try {
+    const programa = await Programas.findOneAndUpdate(
+      { nombre: nombre },
+      updatedData,
+      { new: true, runValidators: true }
     );
+
+    if (!programa) {
+      throw new Error("Programa no encontrado");
+    }
+
+    console.log("Programa actualizado:", programa);
+    return programa;
+  } catch (error) {
+    throw error;
   }
-
-  // El constructor de Programas espera un objeto [cite: 14]
-  const newPrograma = new Programas(data);
-  programas.push(newPrograma);
-  return newPrograma.toJSON(); 
-};
-
-/**
- * Devuelve todos los programas.
- */
-export const getProgramas = () => {
-  return programas.map((p) => p.toJSON()); 
-};
-
-/**
- * Elimina un programa por su nombre.
- * (Asume que la clase base 'Recursos' hace 'nombre' accesible)
- */
-export const deletePrograma = (nombre) => {
-  const index = programas.findIndex((p) => p.nombre === nombre);
-  if (index !== -1) {
-    programas.splice(index, 1);
-    return true;
-  }
-  return false;
-};
-
-/**
- * Actualiza un programa.
- * Sigue el patrón del ejemplo usando Object.assign.
- */
-export const updatePrograma = (nombre, updatedData) => {
-  const programa = programas.find((p) => p.nombre === nombre);
-  if (!programa) {
-    throw new Error("Programa no encontrado");
-  }
-
-  // NOTA: Object.assign solo actualizará propiedades públicas (de 'Recursos').
-  // No puede actualizar los campos privados '#tipoPrograma' o '#fondos' [cite: 15, 16]
-  // porque los modelos no tienen setters.
-  Object.assign(programa, updatedData);
-
-  console.log("Programa actualizado:", programa);
-  return programa.toJSON();
 };

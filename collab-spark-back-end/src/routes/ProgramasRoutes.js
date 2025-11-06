@@ -9,9 +9,9 @@ import {
 export function programasRoutes() {
   const router = Router();
 
-  router.post("/create-programa", (req, res) => {
+  router.post("/create-programa", async (req, res) => {
     try {
-      const nuevoPrograma = createPrograma(req.body);
+      const nuevoPrograma = await createPrograma(req.body);
       return res.status(201).json({
         success: true,
         programa: nuevoPrograma,
@@ -26,33 +26,46 @@ export function programasRoutes() {
     }
   });
 
-  router.get("/get-programas", (req, res) => {
-    const programas = getProgramas();
-    return res.status(200).json({
-      success: true,
-      programas,
-    });
-  });
-
-  router.delete("/delete-programa", (req, res) => {
-    // Siguiendo el modelo de usar req.body.nombre para delete
-    const deleted = deletePrograma(req.body.nombre);
-    if (deleted) {
+  router.get("/get-programas", async (req, res) => {
+    try {
+      const programas = await getProgramas();
       return res.status(200).json({
         success: true,
-        message: "Programa eliminado",
+        programas,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        error: err.message || "Error al obtener programas",
       });
     }
-    return res.status(404).json({
-      success: false,
-      error: "Programa no encontrado",
-    });
   });
 
-  router.put("/update-programa/:nombre", (req, res) => {
+  router.delete("/delete-programa", async (req, res) => {
+    try {
+      const deleted = await deletePrograma(req.body.nombre);
+      if (deleted) {
+        return res.status(200).json({
+          success: true,
+          message: "Programa eliminado",
+        });
+      }
+      return res.status(404).json({
+        success: false,
+        error: "Programa no encontrado",
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        error: err.message || "Error al eliminar programa",
+      });
+    }
+  });
+
+  router.put("/update-programa/:nombre", async (req, res) => {
     try {
       const nombreABuscar = req.params.nombre;
-      const updatedPrograma = updatePrograma(nombreABuscar, req.body);
+      const updatedPrograma = await updatePrograma(nombreABuscar, req.body);
       return res.status(200).json({
         success: true,
         programa: updatedPrograma,
